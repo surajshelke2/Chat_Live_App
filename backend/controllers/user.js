@@ -1,37 +1,57 @@
-const { message } = require("statuses");
+
 const User = require("../model/userModel");
-const bcrypt = require('bcrypt')
+const bcrypt = require("bcrypt");
+const { ErrorHandler } = require("../middleware/error");
+const sendCookie = require("../utils/features");
 
+const registerUser = async (req, res, next) => {
+  try {
+    const { name, email, password, pic } = req.body;
 
-const registerUser = async(req,res)=>{
-    
-    try {
+    const user = await User.findOne({ email });
 
-        const {name,email,password,pic}=req.body;
+    if (user !== null)
+      return res.status(400).json({
+        success: false,
+        message: "User Already Exists!!",
+      });
 
-    const user = await User.findone(email);
+    const hashPassword = await bcrypt.hash(password, 10);
 
-    if(!user) return res.json({
-        success:false,
-        message:"User Already Exits !!"
-    })
+    const newUser = await User.create({
+      name,
+      email,
+      password: hashPassword,
+      pic,
+    });
 
-    const hashPassword = await bcrypt.hash(password,10);
+    sendCookie(newUser, res, "Registration Successfully!!", 201);
+  } catch (error) {
+    next(error);
+  }
+};
 
-    user = await User.create({name,email,password:hashPassword,pic})
+const login = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
 
-    sendCokkies(user,res,"Registartion Suceessfully !!",201)
-    
-        
-    } catch (error) {
+    const user = await User.findOne({ email }).select("+password"); // Fix here
 
-        next()
-        
+    if (!user)
+      return res.json({
+        success: false, // Fix here
+        message: "User Not Exists !!",
+      });
+
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      return next(new ErrorHandler("Invalid Email or Password", 400));
     }
-    
+    sendCookie(user, res, `Login Successfully with ${user.name}!!`, 201); // Fix here
+  } catch (error) {
+    next(error);
+  }
+};
 
-}
-
-
-
-module.exports=registerUser;
+module.exports = { registerUser, login };

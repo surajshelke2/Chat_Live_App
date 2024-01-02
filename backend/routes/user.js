@@ -1,8 +1,10 @@
 const express = require('express');
-const registerUser = require('../controllers/user');
+const { registerUser, login } = require('../controllers/user');
 
 const router = express.Router();
 
-router.post('/rigister',registerUser);
+router.post('/register', registerUser); // Fixed the typo in the endpoint
 
- module.exports = router
+router.post('/login', login);
+
+module.exports = router;

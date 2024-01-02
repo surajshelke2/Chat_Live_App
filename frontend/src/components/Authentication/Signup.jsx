@@ -16,7 +16,7 @@ const Signup = () => {
   const [repassword, setREpassword] = useState("");
   const [show, setShow] = React.useState(false);
   const [show1, setShow1] = React.useState(false);
-  const [pic, setPic] = useState(second)
+  const [pic, setPic] = useState("")
 
   const handleClick = () => setShow(!show);
   const handleClick1 = () => setShow(!show1);

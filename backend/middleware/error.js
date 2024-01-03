@@ -1,19 +1,17 @@
-class ErrorHandler extends Error {
-  constructor(message, statusCode) {
-    super(message), 
-    this.statusCode = statusCode;
-  }
-}
+const notFound = (req, res, next) => {
+  const error = new Error(`Not Found - ${req.originalUrl}`);
+  res.status(404);
+  next(error);
+};
 
-const errorMiddleware = (error, req, res, next) => {
-  error.message = error.message || "Internal Server Error";
-  error.statusCode = error.statusCode || 500;
 
-  return res.status(error.statusCode).json({
-    success: false,
-    message: error.message,
+const errorHandler = (error, req, res, next) => {
+  const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
+  res.status(statusCode);
+  res.json({
+    message: err.message,
   });
 };
 
-module.exports = {errorMiddleware,ErrorHandler}
+module.exports = {notFound ,errorHandler}
 

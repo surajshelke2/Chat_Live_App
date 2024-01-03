@@ -1,57 +1,88 @@
-
 const User = require("../model/userModel");
-const bcrypt = require("bcrypt");
-const { ErrorHandler } = require("../middleware/error");
-const sendCookie = require("../utils/features");
+const generateToken = require("../utils/features");
+const asyncHandler = require("express-async-handler");
 
-const registerUser = async (req, res, next) => {
+const registerUser = asyncHandler(async (req, res, next) => {
   try {
     const { name, email, password, pic } = req.body;
 
-    const user = await User.findOne({ email });
+    if (!name || !email || !password) {
+      res.status(404).json({
+        success: false,
+        message: "Fill the all fileds !!",
+      });
+    }
 
-    if (user !== null)
+    const userExists = await User.findOne({ email });
+    if (userExists)
       return res.status(400).json({
         success: false,
         message: "User Already Exists!!",
       });
 
-    const hashPassword = await bcrypt.hash(password, 10);
-
-    const newUser = await User.create({
+    const user = await User.create({
       name,
       email,
-      password: hashPassword,
+      password,
       pic,
     });
 
-    sendCookie(newUser, res, "Registration Successfully!!", 201);
-  } catch (error) {
-    next(error);
-  }
-};
-
-const login = async (req, res, next) => {
-  try {
-    const { email, password } = req.body;
-
-    const user = await User.findOne({ email }).select("+password"); // Fix here
-
-    if (!user)
-      return res.json({
-        success: false, // Fix here
-        message: "User Not Exists !!",
+    if (user) {
+      res.status(201).json({
+        _id: user.id,
+        name: user.name,
+        email: user.email,
+        pic: user.pic,
+        token: generateToken(user._id),
       });
-
-    const isMatch = await bcrypt.compare(password, user.password);
-
-    if (!isMatch) {
-      return next(new ErrorHandler("Invalid Email or Password", 400));
+    } else {
+      res.status(400);
+      throw new Error("Failed to create the User");
     }
-    sendCookie(user, res, `Login Successfully with ${user.name}!!`, 201); // Fix here
   } catch (error) {
     next(error);
   }
-};
+});
 
-module.exports = { registerUser, login };
+const login = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+
+  const user = await User.findOne({ email });
+
+  if (user && (await user.matchPassword(password))) {
+    res.json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      pic: user.pic,
+      token: generateToken(user._id),
+    });
+
+    console.log(user.name);
+  } else {
+    res.status(401);
+    throw new Error("Invalid Email or Password");
+  }
+});
+const allUsers = asyncHandler(async (req, res) => {
+
+  const keyword = req.query.search
+    ? {
+        $or: [
+          { name: { $regex: req.query.search, $options: "i" } },
+          { email: { $regex: req.query.search, $options: "i" } },
+        ],
+      }
+    : {};
+
+ 
+  const users = await User.find(keyword).find({ _id: { $ne: req.user._id } });
+
+  
+  console.log(users);
+
+  res.send(users);
+});
+
+module.exports = { registerUser ,login ,allUsers };
+

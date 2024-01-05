@@ -20,6 +20,7 @@ import {
   Input,
   Flex,
   useToast,
+  Spinner,
 } from "@chakra-ui/react";
 import { BellIcon, ChevronDownIcon } from "@chakra-ui/icons";
 import React, { useState } from "react";
@@ -40,7 +41,7 @@ const SideDrawer = () => {
 
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const { user } = ChatState();
+  const { user,chats, setchats,selectedChat, setSelectedChat } = ChatState();
 
   const handleSearch = async () => {
     if (!search) {
@@ -94,9 +95,11 @@ const SideDrawer = () => {
           Authorization: `Bearer ${user.token}`,
         },
       };
-      const { data } = await axios.post(`/api/chat`, { userId }, config);
+      const { data } = await axios.post(`http://localhost:5000/api/chat`, { userId }, config);
 
-      if (!chats.find((c) => c._id === data._id)) setChats([data, ...chats]);
+
+      // if  chats alredy with us then update the chats (Appending)
+      if (!chats.find((c) => c._id === data._id)) setchats([data, ...chats]);
       setSelectedChat(data);
       setLoadingChat(false);
       onClose();
@@ -193,6 +196,8 @@ const SideDrawer = () => {
                 />
               ))
             )}
+
+            {loadingChat && <Spinner ml="auto" d="flex"   />}
           </DrawerBody>
         </DrawerContent>
 

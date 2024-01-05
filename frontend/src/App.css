@@ -27,3 +27,14 @@ body {
   font-size: 2rem;
   margin-bottom: 20px;
 }
+
+::-webkit-scrollbar{
+  width: 0px;
+}
+
+::-webkit-scrollbar-thumb{
+  background: rgba(136,136,136,0.281);
+}
+::-webkit-scrollbar-thumb:hover{
+  background: #555;
+}

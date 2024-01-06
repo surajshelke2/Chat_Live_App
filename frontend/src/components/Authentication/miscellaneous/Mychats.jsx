@@ -6,6 +6,7 @@ import { AddIcon } from "@chakra-ui/icons";
 
 import ChatLoading from "../../ChatLoading";
 import { getSender } from "../../../config/ChatLogics";
+import GroupChatModel from "./GroupChatModel";
 
 const Mychats = () => {
   const [loggedUser, setloggedUser] = useState();
@@ -75,6 +76,8 @@ const Mychats = () => {
           fontFamily="revert"
           mt={2}
         >
+
+          <GroupChatModel>
           <Button
             d="flex"
             fontSize={{ base: "17px", md: "16px", lg: "15px" }}
@@ -86,6 +89,7 @@ const Mychats = () => {
           >
             My Group Chat
           </Button>
+          </GroupChatModel>
         </Box>
       </Box>
 
@@ -95,7 +99,7 @@ const Mychats = () => {
   p={3}
   bg="gray.200"  // Set your background color here
   w="100%"
-  h="100%"
+  h="90%"
   borderRadius="lg"
   overflowY="hidden"
 >

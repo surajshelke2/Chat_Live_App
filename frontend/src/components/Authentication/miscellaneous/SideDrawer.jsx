@@ -133,7 +133,7 @@ const SideDrawer = () => {
         <Tooltip label="Search User" hasArrow placeContent="bottom-end">
           <Button variant="ghost" onClick={onOpen}>
             <i className="fas fa-search" />
-            <Text d={{ base: "none", md: "flex" }} px="4">
+            <Text display={{ base: "none", md: "flex" }} px="4">
               Search User
             </Text>
           </Button>
@@ -197,7 +197,7 @@ const SideDrawer = () => {
               ))
             )}
 
-            {loadingChat && <Spinner ml="auto" d="flex"   />}
+            {loadingChat && <Spinner ml="auto" display="flex"   />}
           </DrawerBody>
         </DrawerContent>
 

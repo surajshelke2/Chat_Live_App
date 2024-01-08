@@ -8,7 +8,7 @@ import ChatLoading from "../../ChatLoading";
 import { getSender } from "../../../config/ChatLogics";
 import GroupChatModel from "./GroupChatModel";
 
-const Mychats = () => {
+const Mychats = ({fetchAgain}) => {
   const [loggedUser, setloggedUser] = useState();
 
   const { user, chats, setchats, selectedChat, setSelectedChat } = ChatState();
@@ -44,11 +44,12 @@ const Mychats = () => {
   useEffect(() => {
     setloggedUser(JSON.parse(localStorage.getItem("userInfo")));
     featchChat();
-  }, []);
+    
+  },[fetchAgain]);
 
   return (
     <Box
-      d={{ base: selectedChat ? "none" : "flex", md: "flex" }}
+      display={{ base: selectedChat ? "none" : "flex", md: "flex" }}
       flexDir="column"
       h="100%"
       alignItems="center"
@@ -79,7 +80,7 @@ const Mychats = () => {
 
           <GroupChatModel>
           <Button
-            d="flex"
+            display="flex"
             fontSize={{ base: "17px", md: "16px", lg: "15px" }}
             rightIcon={<AddIcon />}
             onClick={() => {
@@ -94,14 +95,15 @@ const Mychats = () => {
       </Box>
 
       <Box 
-  d="flex"
+  display="flex"
   flexDir="column"
   p={3}
   bg="gray.200"  // Set your background color here
   w="100%"
   h="90%"
   borderRadius="lg"
-  overflowY="hidden"
+  overflowY="scroll"
+  
 >
   {chats ? (
     <Stack overflowY="scroll">
@@ -115,6 +117,7 @@ const Mychats = () => {
           py={2}
           borderRadius="lg"
           key={chat._id}
+          transition="background-color 0.3s, color 0.3s"
         >
 
          { console.log("CHATS :",chats)}

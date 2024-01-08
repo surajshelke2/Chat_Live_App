@@ -107,10 +107,10 @@ const createGroupChat = asyncHandler(async (req, res) => {
 const renameGroup = asyncHandler(async (req, res) => {
   const { chatId, chatName } = req.body;
 
-  const updateChat = await Chat.findById(
+  const updateChat = await Chat.findByIdAndUpdate(
     chatId,
     {
-      chatName,
+      chatName :chatName,
     },
     {
       new: true,
@@ -123,8 +123,8 @@ const renameGroup = asyncHandler(async (req, res) => {
     res.status(400);
     throw new Error("Chat Not Found !!");
   } else {
-    console.log(updateChat);
-    res.send(updateChat);
+   
+    res.json(updateChat);
   }
 });
 const addToGroup = asyncHandler(async (req, res) => {

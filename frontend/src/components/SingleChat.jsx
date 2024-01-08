@@ -6,7 +6,7 @@ import { getSender, getSenderFull } from "../config/ChatLogics";
 import ProfileModel from "./Authentication/miscellaneous/ProfileModel";
 import UpdateGroupChatModel from "./Authentication/miscellaneous/UpdateGroupChatModel";
 
-const SingleChat = ({ fetchAgain, setFetchAgain }) => {
+const SingleChat = () => {
   const { user, selectedChat, setSelectedChat } = ChatState();
 
   return (
@@ -27,7 +27,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
               <IconButton
                 display={{ base: "flex", md: "none" }}
                 icon={<ArrowBackIcon />}
-                onClick={() => setSelectedChat(" ")}
+                onClick={() => setSelectedChat('')}
                 color="teal.500"
                 _hover={{ color: "teal.700" }}
               ></IconButton>
@@ -42,8 +42,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
               <>
                 {selectedChat.chatName.toUpperCase()}
                 <UpdateGroupChatModel
-                  fetchAgain={fetchAgain}
-                  setFetchAgain={setFetchAgain}
+                 
                 />
               </>
             )}
@@ -66,12 +65,15 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       ) : (
         <Box
           display="flex"
-          alignItems="center"
+    
           justifyContent="center"
           height="100%"
           bg="#E8E8E8"
-          padding={4}
+          w='100%'
+          alignItems="center"
+          padding={1}
           borderRadius="md"
+          overflow="hidden"
         >
           <Text fontSize="3xl" color="GrayText" fontFamily="sans-serif">
             Click on a User to Start Chatting

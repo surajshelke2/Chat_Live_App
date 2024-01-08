@@ -20,9 +20,9 @@ import UserBadgeItem from "../../UserAvtar/UserBadgeItem";
 import { ViewIcon } from "@chakra-ui/icons";
 import { ChatState } from "../../../Context/ChatProvider";
 
-const UpdateGroupChatModel = ({ fetchAgain, setFetchAgain }) => {
+const UpdateGroupChatModel = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { selectedChat, user, setSelectedChat } = ChatState();
+  const { selectedChat, user, setSelectedChat ,fetchAgain, setFetchAgain} = ChatState();
   const [groupChatName, setGroupChatName] = useState("");
   const [renameLoading, setRenameLoading] = useState(false);
   const [search, setSearch] = useState("");

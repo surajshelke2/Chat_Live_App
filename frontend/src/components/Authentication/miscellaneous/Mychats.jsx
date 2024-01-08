@@ -8,10 +8,10 @@ import ChatLoading from "../../ChatLoading";
 import { getSender } from "../../../config/ChatLogics";
 import GroupChatModel from "./GroupChatModel";
 
-const Mychats = ({fetchAgain}) => {
+const Mychats = () => {
   const [loggedUser, setloggedUser] = useState();
 
-  const { user, chats, setchats, selectedChat, setSelectedChat } = ChatState();
+  const { user, chats, setchats,fetchAgain, selectedChat, setSelectedChat } = ChatState();
   const toast = useToast();
 
   const featchChat = async () => {
@@ -25,10 +25,10 @@ const Mychats = ({fetchAgain}) => {
         `http://localhost:5000/api/chat`,
         config
       );
-      console.log("Hill");
+    
       setchats(data);
 
-      console.log(data);
+      console.log("render");
     } catch (error) {
       toast({
         title: "Error fetching the chat",
@@ -98,7 +98,7 @@ const Mychats = ({fetchAgain}) => {
   display="flex"
   flexDir="column"
   p={3}
-  bg="gray.200"  // Set your background color here
+  bg="gray.200"  
   w="100%"
   h="90%"
   borderRadius="lg"
@@ -120,7 +120,7 @@ const Mychats = ({fetchAgain}) => {
           transition="background-color 0.3s, color 0.3s"
         >
 
-         { console.log("CHATS :",chats)}
+       
 
           <Text>
             {!chat.isGroupChat?

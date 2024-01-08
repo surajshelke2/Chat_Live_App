@@ -6,6 +6,7 @@ const { errorMiddleware, notFound, errorHandler } = require("./middleware/error"
 const chats = require("./data/data");
 const userRouter = require("./routes/user");
 const chatRouter = require("./routes/chatRouter");
+const messageRouter = require('./routes/messageRouter')
 
 dotenv.config();
 
@@ -18,6 +19,7 @@ app.use(cors());
 
 app.use("/api/chat", chatRouter);
 app.use("/api/user", userRouter);
+app.use("/api/message",messageRouter);
 
 
 app.use("/", (req, res) => res.send("hello"));

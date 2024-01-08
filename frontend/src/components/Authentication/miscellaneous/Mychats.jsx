@@ -11,7 +11,8 @@ import GroupChatModel from "./GroupChatModel";
 const Mychats = () => {
   const [loggedUser, setloggedUser] = useState();
 
-  const { user, chats, setchats,fetchAgain, selectedChat, setSelectedChat } = ChatState();
+  const { user, chats, setchats, fetchAgain, selectedChat, setSelectedChat } =
+    ChatState();
   const toast = useToast();
 
   const featchChat = async () => {
@@ -25,7 +26,7 @@ const Mychats = () => {
         `http://localhost:5000/api/chat`,
         config
       );
-    
+
       setchats(data);
 
       console.log("render");
@@ -44,8 +45,7 @@ const Mychats = () => {
   useEffect(() => {
     setloggedUser(JSON.parse(localStorage.getItem("userInfo")));
     featchChat();
-    
-  },[fetchAgain]);
+  }, [fetchAgain]);
 
   return (
     <Box
@@ -66,7 +66,7 @@ const Mychats = () => {
           px={3}
           fontSize={{ base: "28px", md: "20px" }}
           fontFamily="revert"
-          mt={2}
+          mt={3}
         >
           MyChats
         </Box>
@@ -75,66 +75,60 @@ const Mychats = () => {
           px={3}
           fontSize={{ base: "28px", md: "20px" }}
           fontFamily="revert"
-          mt={2}
+          mt={1}
         >
-
           <GroupChatModel>
-          <Button
-            display="flex"
-            fontSize={{ base: "17px", md: "16px", lg: "15px" }}
-            rightIcon={<AddIcon />}
-            onClick={() => {
-              console.log("Add button clicked!");
-            }}
-            size="sm"
-          >
-            My Group Chat
-          </Button>
+            <Button
+              display="flex"
+              fontSize={{ base: "20px", md: "16px", lg: "15px" }}
+              rightIcon={<AddIcon />}
+              onClick={() => {
+                console.log("Add button clicked!");
+              }}
+              size="sm"
+            >
+              My Group Chat
+            </Button>
           </GroupChatModel>
         </Box>
       </Box>
 
-      <Box 
-  display="flex"
-  flexDir="column"
-  p={3}
-  bg="gray.200"  
-  w="100%"
-  h="90%"
-  borderRadius="lg"
-  overflowY="scroll"
-  
->
-  {chats ? (
-    <Stack overflowY="scroll">
-      {chats.map((chat) => (
-        <Box
-          onClick={() => setSelectedChat(chat)}
-          cursor="pointer"
-          bg={selectedChat === chat ? "teal.500" : "white"}  
-          color={selectedChat === chat ? "white" : "black"}
-          px={3}
-          py={2}
-          borderRadius="lg"
-          key={chat._id}
-          transition="background-color 0.3s, color 0.3s"
-        >
-
-       
-
-          <Text>
-            {!chat.isGroupChat?
-
-              getSender(loggedUser,chat.users):chat.chatName}
-          </Text>
-        
-        </Box>
-      ))}
-    </Stack>
-  ) : (
-    <ChatLoading />
-  )}
-</Box>
+      <Box
+        display="flex"
+        flexDir="column"
+        p={2}
+        bg="gray.200"
+        w="100%"
+        h="90%"
+        borderRadius="lg"
+        overflowY="scroll"
+      >
+        {chats ? (
+          <Stack overflowY="scroll">
+            {chats.map((chat) => (
+              <Box
+                onClick={() => setSelectedChat(chat)}
+                cursor="pointer"
+                bg={selectedChat === chat ? "teal.500" : "white"}
+                color={selectedChat === chat ? "white" : "black"}
+                px={3}
+                py={2}
+                borderRadius="lg"
+                key={chat._id}
+                transition="background-color 0.3s, color 0.3s"
+              >
+                <Text>
+                  {!chat.isGroupChat
+                    ? getSender(loggedUser, chat.users)
+                    : chat.chatName}
+                </Text>
+              </Box>
+            ))}
+          </Stack>
+        ) : (
+          <ChatLoading />
+        )}
+      </Box>
     </Box>
   );
 };

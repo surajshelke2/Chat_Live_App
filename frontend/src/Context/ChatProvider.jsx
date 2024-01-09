@@ -1,13 +1,13 @@
 import React, { createContext, useEffect, useState, useContext } from "react";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 const ChatContext = createContext();
 
 const ChatProvider = ({ children }) => {
   const [user, setUser] = useState();
-  const [selectedChat, setSelectedChat] = useState()
-  const [chats, setchats] = useState([])
-  const [fetchAgain, setFetchAgain] = useState(false)  
+  const [selectedChat, setSelectedChat] = useState();
+  const [chats, setchats] = useState([]);
+  const [fetchAgain, setFetchAgain] = useState(false);
 
   const navigate = useNavigate();
 
@@ -16,12 +16,23 @@ const ChatProvider = ({ children }) => {
     setUser(userInfo);
 
     if (!userInfo) {
-      navigate('/');
+      navigate("/");
     }
   }, [navigate]);
 
   return (
-    <ChatContext.Provider value={{ user,fetchAgain,setFetchAgain, setUser,chats, setchats,selectedChat, setSelectedChat}}>
+    <ChatContext.Provider
+      value={{
+        user,
+        fetchAgain,
+        setFetchAgain,
+        setUser,
+        chats,
+        setchats,
+        selectedChat,
+        setSelectedChat,
+      }}
+    >
       {children}
     </ChatContext.Provider>
   );

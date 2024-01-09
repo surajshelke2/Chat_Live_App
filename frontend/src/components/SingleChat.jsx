@@ -1,13 +1,106 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { ChatState } from "../Context/ChatProvider";
-import { Box, IconButton, Text } from "@chakra-ui/react";
+import {
+  Box,
+  FormControl,
+  IconButton,
+  Input,
+  Spinner,
+  Text,
+  useToast,
+} from "@chakra-ui/react";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import { getSender, getSenderFull } from "../config/ChatLogics";
 import ProfileModel from "./Authentication/miscellaneous/ProfileModel";
 import UpdateGroupChatModel from "./Authentication/miscellaneous/UpdateGroupChatModel";
+import axios from "axios";
+import "./style.css";
+import ScrollableChat from "./ScrollableChat";
 
 const SingleChat = () => {
   const { user, selectedChat, setSelectedChat } = ChatState();
+  const [message, setMessage] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [newMessage, setNewMessage] = useState("");
+
+  const toast = useToast();
+
+  const sendMessage = async (e) => {
+    if (e.key === "Enter" && newMessage) {
+      try {
+        const config = {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${user.token}`,
+          },
+        };
+        setNewMessage("");
+        const { data } = await axios.post(
+          `http://localhost:5000/api/message`,
+          {
+            content: newMessage,
+            chatId: selectedChat,
+          },
+          config
+        );
+
+        setMessage([...message, data]);
+      } catch (error) {
+        toast({
+          title: "Error Occures !!",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+          position: "bottom-left",
+        });
+      }
+    }
+  };
+
+  const fetchMessages = async () => {
+    if (!selectedChat) return;
+
+    try {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      };
+
+      setLoading(true);
+
+      const response = await axios.get(
+        `http://localhost:5000/api/message/${selectedChat._id}`,
+        config
+      );
+
+      const { data } = response;
+      console.log("Fetched Messages:", data);
+
+      setMessage(data);
+    } catch (error) {
+      console.error("Error fetching messages:", error);
+
+      toast({
+        title: "Error Occurred!",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom-left",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchMessages();
+  }, [selectedChat]);
+
+  const typingHandler = (e) => {
+    setNewMessage(e.target.value);
+    console.log(newMessage);
+  };
 
   return (
     <>
@@ -27,7 +120,7 @@ const SingleChat = () => {
               <IconButton
                 display={{ base: "flex", md: "none" }}
                 icon={<ArrowBackIcon />}
-                onClick={() => setSelectedChat('')}
+                onClick={() => setSelectedChat("")}
                 color="teal.500"
                 _hover={{ color: "teal.700" }}
               ></IconButton>
@@ -41,9 +134,7 @@ const SingleChat = () => {
             ) : (
               <>
                 {selectedChat.chatName.toUpperCase()}
-                <UpdateGroupChatModel
-                 
-                />
+                <UpdateGroupChatModel fetchMessages={fetchMessages} />
               </>
             )}
           </Text>
@@ -59,17 +150,38 @@ const SingleChat = () => {
             borderRadius="md"
             overflowY="hidden"
           >
-            {/* <Messages/> */}
+            {loading ? (
+              <Spinner
+                size="xl"
+                w={20}
+                h={20}
+                alignSelf="center"
+                margin="auto"
+              />
+            ) : (
+              <div className="message">
+                <ScrollableChat messages={message}></ScrollableChat>
+              </div>
+            )}
+
+            <FormControl onKeyDown={sendMessage} isRequired mt={3}>
+              <Input
+                variant="filled"
+                bg="#E0E0E0"
+                placeholder="Enter the message ..."
+                onChange={typingHandler}
+                value={newMessage}
+              />
+            </FormControl>
           </Box>
         </>
       ) : (
         <Box
           display="flex"
-    
           justifyContent="center"
           height="100%"
           bg="#E8E8E8"
-          w='100%'
+          w="100%"
           alignItems="center"
           padding={1}
           borderRadius="md"

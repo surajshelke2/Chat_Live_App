@@ -22,7 +22,7 @@ import { ViewIcon } from "@chakra-ui/icons";
 import { ChatState } from "../../../Context/ChatProvider";
 import UserListItem from "../../UserAvtar/UserListItem";
 
-const UpdateGroupChatModel = () => {
+const UpdateGroupChatModel = ({fetchMessages}) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { selectedChat, user, setSelectedChat, fetchAgain, setFetchAgain } =
     ChatState();
@@ -120,6 +120,7 @@ const UpdateGroupChatModel = () => {
 
        user1._id ===user._id ? setSelectedChat() : setSelectedChat(data);
       setFetchAgain(!fetchAgain);
+      fetchMessages();
       setLoading(false);
     } catch (error) {
       toast({

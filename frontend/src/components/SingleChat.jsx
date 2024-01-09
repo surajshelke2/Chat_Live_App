@@ -16,12 +16,17 @@ import UpdateGroupChatModel from "./Authentication/miscellaneous/UpdateGroupChat
 import axios from "axios";
 import "./style.css";
 import ScrollableChat from "./ScrollableChat";
+import io from "socket.io-client";
+
+const ENDPOINT = "http://localhost:5000";
+let socket, selectedChatCompare;
 
 const SingleChat = () => {
   const { user, selectedChat, setSelectedChat } = ChatState();
   const [message, setMessage] = useState([]);
   const [loading, setLoading] = useState(false);
   const [newMessage, setNewMessage] = useState("");
+  const [socketConnected, setSocketConnected] = useState(false);
 
   const toast = useToast();
 
@@ -44,6 +49,7 @@ const SingleChat = () => {
           config
         );
 
+        socket.emit("new message", data);
         setMessage([...message, data]);
       } catch (error) {
         toast({
@@ -75,9 +81,12 @@ const SingleChat = () => {
       );
 
       const { data } = response;
-      console.log("Fetched Messages:", data);
 
       setMessage(data);
+      setLoading(false);
+
+      socket.emit("join chat", selectedChat._id);
+      //join the chart room using the current chat collection
     } catch (error) {
       console.error("Error fetching messages:", error);
 
@@ -94,8 +103,36 @@ const SingleChat = () => {
   };
 
   useEffect(() => {
+    socket = io(ENDPOINT);
+    // Emit a 'setup' event with user data to the server
+    socket.emit("setup", user);
+    // Set up an event listener for the 'connection' event
+    socket.on("connection", () => setSocketConnected(true));
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
     fetchMessages();
+    selectedChatCompare = selectedChat;
   }, [selectedChat]);
+
+  useEffect(() => {
+    socket.on("message recieved", (newMessageRecieved) => {
+      if (
+        !selectedChatCompare || // if chat is not selected or doesn't match current chat
+        selectedChatCompare._id !== newMessageRecieved.chat._id
+      ) {
+        
+      } else {
+        setMessage((prevMessages) => [...prevMessages, newMessageRecieved]);
+        console.log("fine");
+      }
+    });
+  },[message]);
+
 
   const typingHandler = (e) => {
     setNewMessage(e.target.value);

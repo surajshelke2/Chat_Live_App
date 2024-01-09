@@ -147,7 +147,7 @@ const addToGroup = asyncHandler(async (req, res) => {
       res.status(400);
       throw new Error("User Not Added !!");
     } else {
-      console.log(added);
+    
       res.send(added);
     }
   });
@@ -172,7 +172,7 @@ const addToGroup = asyncHandler(async (req, res) => {
       res.status(400);
       throw new Error("User Not Added !!");
     } else {
-      console.log(added);
+   
       res.send(added);
     }
   });

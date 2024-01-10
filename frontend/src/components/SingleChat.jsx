@@ -35,7 +35,7 @@ const SingleChat = () => {
   const sendMessage = async (e) => {
     console.log("sending message called ");
     if (e.key === "Enter" && newMessage) {
-      socket.emit("stop typing", selectedChat._id);
+     
       try {
         const config = {
           headers: {
@@ -136,6 +136,11 @@ const SingleChat = () => {
   }, [selectedChatCompare]);
 
 
+  const typingHandler =(e)=>{
+    setNewMessage(e.target.value);
+  }
+
+
   return (
     <>
       {selectedChat ? (
@@ -199,11 +204,7 @@ const SingleChat = () => {
             )}
 
             <FormControl onKeyDown={sendMessage} isRequired mt={3}>
-              {typing ? (
-                <div className="loading-indicator">Loading...</div>
-              ) : (
-                <></>
-              )}
+             
 
               <Input
                 variant="filled"

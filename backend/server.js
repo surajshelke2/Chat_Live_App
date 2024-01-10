@@ -2,6 +2,7 @@ const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
 const connectDB = require("./databases/database");
+const path = require('path');
 const {
   errorMiddleware,
   notFound,
@@ -26,8 +27,23 @@ app.use("/api/chat", chatRouter);
 app.use("/api/user", userRouter);
 app.use("/api/message", messageRouter);
 
-app.use("/", (req, res) => res.send("hello"));
-// Error Handling middlewares
+
+const __dirname1 = path.resolve();
+
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname1, "/frontend/dist")));
+
+  app.get("*", (req, res) =>
+    res.sendFile(path.resolve(__dirname1, "frontend", "dist", "index.html"))
+  );
+} else {
+  app.get("/", (req, res) => {
+    res.send("API is running..");
+  });
+}
+
+
+
 app.use(notFound);
 app.use(errorHandler);
 
@@ -77,6 +93,11 @@ io.on("connection", (socket) => {
       socket.to(recipientRoom).emit("message received", newMessageRecieved);
       console.log(`Message sent to user ${user._id} in room ${recipientRoom}`);
     });
+  });
+
+  socket.off("setup", () => {
+    console.log("USER DISCONNECTED");
+    socket.leave(userData._id);
   });
   
 });

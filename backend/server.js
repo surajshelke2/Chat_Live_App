@@ -43,30 +43,40 @@ const io = require("socket.io")(server, {
 });
 
 io.on("connection", (socket) => {
+  // Event: Setup
   socket.on("setup", (userData) => {
     // Join the socket room using the user's ID
-    socket.join("current User :" + userData._id);
-    console.log(userData._id);
+    const userRoom = "current User :" + userData._id;
+    socket.join(userRoom);
+    console.log(`User ${userData._id} connected and joined room ${userRoom}`);
+
     // Emit a 'connected' event back to the connected client
     socket.emit("connected");
   });
 
+  // Event: Join Chat
   socket.on("join chat", (room) => {
     socket.join(room);
-    console.log("User Joined Room " + room);
+    console.log(`User ${socket.id} joined chat room ${room}`);
   });
 
-  socket.on("new message", (newMessageRecieved) => {
-    var chat = newMessageRecieved.chat;
 
-    if (!chat.users) return console.log("chat.users not defined !!");
 
+
+
+  // Event: New Message
+  socket.on("newMessage", (newMessageRecieved) => {
+    const chat = newMessageRecieved.chat;
+  
+    if (!chat.users) return console.log("Chat users not defined!!");
+  
     chat.users.forEach((user) => {
-      if (user._id == newMessageRecieved.sender._id) return;
-
-      console.log(newMessageRecieved);
-
-      socket.in(user._id).emit("message reciecved", newMessageRecieved);
+      if (user._id === newMessageRecieved.sender._id) return; // Skip the sender
+  
+      const recipientRoom = "current User :" + user._id;
+      socket.to(recipientRoom).emit("message received", newMessageRecieved);
+      console.log(`Message sent to user ${user._id} in room ${recipientRoom}`);
     });
   });
+  
 });

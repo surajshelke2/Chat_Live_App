@@ -19,7 +19,7 @@ import ScrollableChat from "./ScrollableChat";
 import io from "socket.io-client";
 
 const ENDPOINT = "http://localhost:5000";
-let socket, selectedChatCompare;
+let socket;
 
 const SingleChat = () => {
   const { user, selectedChat, setSelectedChat } = ChatState();
@@ -27,11 +27,15 @@ const SingleChat = () => {
   const [loading, setLoading] = useState(false);
   const [newMessage, setNewMessage] = useState("");
   const [socketConnected, setSocketConnected] = useState(false);
+  const [selectedChatCompare, setSelectedChatCompare] = useState(null);
+
 
   const toast = useToast();
 
   const sendMessage = async (e) => {
+    console.log("sending message called ");
     if (e.key === "Enter" && newMessage) {
+      socket.emit("stop typing", selectedChat._id);
       try {
         const config = {
           headers: {
@@ -49,7 +53,7 @@ const SingleChat = () => {
           config
         );
 
-        socket.emit("new message", data);
+        socket.emit("newMessage", data);
         setMessage([...message, data]);
       } catch (error) {
         toast({
@@ -106,38 +110,31 @@ const SingleChat = () => {
     socket = io(ENDPOINT);
     // Emit a 'setup' event with user data to the server
     socket.emit("setup", user);
-    // Set up an event listener for the 'connection' event
-    socket.on("connection", () => setSocketConnected(true));
 
-    return () => {
-      socket.disconnect();
-    };
+    socket.on("connected", () => setSocketConnected(true));
+
+
+    
   }, []);
 
   useEffect(() => {
     fetchMessages();
-    selectedChatCompare = selectedChat;
+    setSelectedChatCompare(selectedChat);
   }, [selectedChat]);
 
   useEffect(() => {
-    socket.on("message recieved", (newMessageRecieved) => {
+    socket.on("message received", (newMessageReceived) => {
       if (
-        !selectedChatCompare || // if chat is not selected or doesn't match current chat
-        selectedChatCompare._id !== newMessageRecieved.chat._id
+        !selectedChatCompare ||
+        selectedChatCompare._id !== newMessageReceived.chat._id
       ) {
-        
+        // Handle the condition
       } else {
-        setMessage((prevMessages) => [...prevMessages, newMessageRecieved]);
-        console.log("fine");
+        setMessage((prevMessages) => [...prevMessages, newMessageReceived]);
       }
     });
-  },[message]);
+  }, [selectedChatCompare]);
 
-
-  const typingHandler = (e) => {
-    setNewMessage(e.target.value);
-    console.log(newMessage);
-  };
 
   return (
     <>
@@ -202,6 +199,12 @@ const SingleChat = () => {
             )}
 
             <FormControl onKeyDown={sendMessage} isRequired mt={3}>
+              {typing ? (
+                <div className="loading-indicator">Loading...</div>
+              ) : (
+                <></>
+              )}
+
               <Input
                 variant="filled"
                 bg="#E0E0E0"

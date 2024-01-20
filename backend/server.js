@@ -23,6 +23,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+
 app.use("/api/chat", chatRouter);
 app.use("/api/user", userRouter);
 app.use("/api/message", messageRouter);
@@ -54,7 +55,7 @@ const server = app.listen(PORT, () => console.log("Server is connected !!"));
 const io = require("socket.io")(server, {
   pinTimeout: 6000,
   cors: {
-    origin: "http://localhost:5173",
+    origin: process.env.FRONTEND_URL,
   },
 });
 
